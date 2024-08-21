@@ -45,6 +45,26 @@ def plot_voltages(
     return fig
 
 
+def extract_dataframes(topology_file):
+    # Extract topology
+    with open(topology_file) as f:
+        topology = Topology.parse_obj(json.load(f))
+    bus_coordinates = pd.DataFrame()
+    bus_voltage = pd.DataFrame(columns=["name", "a", "b", "c"])
+    branch_flow = pd.DataFrame(columns=["fb", "tb", "a", "b", "c"])
+
+    phases = "abc"
+    for i in range(len(topology.admittance.from_equipment)):
+        if topology.admittance.from_equipment[i] == topology.admittance.to_equipment[i]:
+            continue
+        from_bus_name, from_phase = topology.admittance.from_equipment[i].split(".")
+        from_phase = phases[int(from_phase) - 1]
+        to_bus_name, to_phase = topology.admittance.to_equipment[i].split(".")
+        to_phase = phases[int(to_phase) - 1]
+        if from_bus_name == to_bus_name and from_phase == to_phase:
+            continue
+        pass
+
 def extract_topology(topology_file, buscoord_file, sep="    "):
     
     # Extract topology

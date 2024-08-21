@@ -1,0 +1,41 @@
+{
+  "name": "test_omoo",
+  "federates": [
+    {
+      "directory": "recorder_voltage_magnitude",
+      "hostname": "localhost",
+      "name": "recorder_voltage_magnitude",
+      "exec": "python record.py"
+    },
+    {
+      "directory": "recorder_opf_voltage_magnitude",
+      "hostname": "localhost",
+      "name": "recorder_opf_voltage_magnitude",
+      "exec": "python record.py"
+    },
+    {
+      "directory": "recorder_opf_dispatch",
+      "hostname": "localhost",
+      "name": "recorder_opf_dispatch",
+      "exec": "python record.py"
+    },
+    {
+      "directory": "optimal_pf",
+      "hostname": "localhost",
+      "name": "optimal_pf",
+      "exec": "python OMOO.py"
+    },
+    {
+      "directory": "feeder",
+      "hostname": "localhost",
+      "name": "feeder",
+      "exec": "python sender_cosim.py"
+    },
+    {
+      "directory": ".",
+      "hostname": "localhost",
+      "name": "broker",
+      "exec": "helics_broker -f 5 --loglevel=warning"
+    }
+  ]
+}
