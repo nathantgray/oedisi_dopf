@@ -8,7 +8,7 @@ import json
 import pyarrow.feather as feather
 from geopy.distance import geodesic
 from datetime import datetime
-from post_process.errors import errors
+from errors import errors
 
 def plot_voltages(
         df_voltages, base_voltages, 

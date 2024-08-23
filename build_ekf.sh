@@ -10,23 +10,23 @@ sudo apt install -y libboost-dev libzmq5-dev git cmake-curses-gui build-essentia
 mkdir $pwd/build 
 cd $pwd/build 
 
-git clone https://github.com/GMLC-TDC/HELICS 
-cd HELICS 
+git clone https://github.com/GMLC-TDC/HELICS
+cd HELICS
 
-mkdir build 
-cd build 
-cmake -DHELICS_BUILD_CXX_SHARED_LIB=True ../ 
+mkdir build
+cd build
+cmake -DHELICS_BUILD_CXX_SHARED_LIB=True ../
 make
 sudo make install
 
 
-cd $pwd/build 
-wget http://archive.apache.org/dist/activemq/activemq-cpp/3.9.5/activemq-cpp-library-3.9.5-src.tar.gz 
-tar -xzf activemq-cpp-library-3.9.5-src.tar.gz 
-cd activemq-cpp-library-3.9.5 
-./configure 
-make 
-sudo make install 
+cd $pwd/build
+wget http://archive.apache.org/dist/activemq/activemq-cpp/3.9.5/activemq-cpp-library-3.9.5-src.tar.gz
+tar -xzf activemq-cpp-library-3.9.5-src.tar.gz
+cd activemq-cpp-library-3.9.5
+./configure
+make
+sudo make install
 
 sudo apt install -y liblapack-dev libblas-dev libssl-dev
 
@@ -37,6 +37,6 @@ git clone https://github.com/GRIDAPPSD/SuiteSparse
 git clone https://github.com/GRIDAPPSD/json 
 LD_LIBRARY_PATH=/build/gridappsd-state-estimator/SuiteSparse/lib/ 
 make -C SuiteSparse LAPACK=-llapack BLAS=-lblas 
-make -C state-estimator 
+make -C state-estimator gadal
 make install
 cp state-estimator/bin/* $pwd/ekf_federate/
