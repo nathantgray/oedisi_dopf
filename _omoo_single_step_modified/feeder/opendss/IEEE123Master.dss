@@ -16,7 +16,7 @@ Clear
 ! The ~ is just shorthad for "more" for the New or Edit commands
 
 New object=circuit.ieee123
-~ basekv=4.16 Bus1=150 pu=1.05 R1=0 X1=0.0001 R0=0 X0=0.0001
+~ basekv=4.16 Bus1=150 pu=1.00 R1=0 X1=0.0001 R0=0 X0=0.0001
 
 ! 3-PHASE GANGED REGULATOR AT HEAD OF FEEDER (KERSTING ASSUMES NO IMPEDANCE IN THE REGULATOR)
 ! the first line defines the 3-phase transformer to be controlled by the regulator control.
@@ -182,6 +182,8 @@ New Line.Sw6    phases=3  Bus1=61     Bus2=61s    r1=1e-3 r0=1e-3 x1=0.000 x0=0.
 
 ! New Line.Sw7    phases=3  Bus1=151    Bus2=300_OPEN   r1=1e-3 r0=1e-3  x1=0.000 x0=0.000 c1=0.000 c0=0.000 Length=0.001
 ! New Line.Sw8    phases=1  Bus1=54.1   Bus2=94_OPEN.1  r1=1e-3 r0=1e-3  x1=0.000 x0=0.000 c1=0.000 c0=0.000 Length=0.001
+New Line.Sw7    phases=3  Bus1=151    Bus2=300   switch=True r1=1e-3 r0=1e-3  x1=0.000 x0=0.000 c1=0.000 c0=0.000 Length=0.001
+New Line.Sw8    phases=1  Bus1=54.1   Bus2=94.1  switch=True r1=1e-3 r0=1e-3  x1=0.000 x0=0.000 c1=0.000 c0=0.000 Length=0.001
 
 ! LOAD TRANSFORMER AT 61s/610
 ! This is a 150 kVA Delta-Delta stepdown from 4160V to 480V.
@@ -204,15 +206,12 @@ New Capacitor.C92c      Bus1=92.3    Phases=1     kVAR=50      kV=2.402
 !REGULATORS - REDIRECT TO DEFINITIONS FILE
 ! This file contains definitions for the remainder of regulators on the feeder:
 
-Redirect IEEE123Regulators.dss
+Redirect IEEE123Regulators.DSS
 
 ! SPOT LOADS -- REDIRECT INPUT STREAM TO LOAD DEFINITIONS FILE
 
-! Redirect IEEE123LoadShapes.dss
-Redirect IEEE123Loads.dss
+Redirect IEEE123Loads.DSS
 
-!Redirect IEEE123PvShapes.dss
-Redirect IEEE123Pv30.dss
 ! All devices in the test feeder are now defined.
 !
 ! Many of the voltages are reported in per unit, so it is important to establish the base voltages at each bus so
@@ -220,11 +219,5 @@ Redirect IEEE123Pv30.dss
 ! We will let the DSS compute the voltage bases by doing a zero-load power flow.
 ! There are only two voltage bases in the problem: 4160V and 480V. These must be expressed in kV
 
-Set VoltageBases = [4.16, 0.48, .303]    ! ARRAY OF VOLTAGES IN KV
+Set VoltageBases = [4.16, 0.48]    ! ARRAY OF VOLTAGES IN KV
 CalcVoltageBases  ! PERFORMS ZERO LOAD POWER FLOW TO ESTIMATE VOLTAGE BASES
-! Open Line.Sw7
-! Open Line.Sw8
-set loadmult=1
-Set Controlmode=OFF
-solve
-Buscoords BusCoords.dat   ! load in bus coordinates

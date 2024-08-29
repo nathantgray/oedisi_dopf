@@ -3,6 +3,7 @@
 
 
 ! These line codes are used in the 123-bus circuit
+! unit is in kft
 
 New linecode.1 nphases=3 BaseFreq=60
 !!!~ rmatrix = (0.088205 | 0.0312137 0.0901946 | 0.0306264 0.0316143 0.0889665 )

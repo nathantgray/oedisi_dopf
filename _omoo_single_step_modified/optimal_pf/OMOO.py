@@ -42,7 +42,7 @@ import xarray as xr
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler())
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
 def eqarray_to_xarray(eq: EquipmentNodeArray):
@@ -290,6 +290,7 @@ def pv_cost(
         Qk_current[pp] = Q
         Pck_last[pp] = Pck_v
         tot_cost_v = tot_cost_vv
+    logger.info(f"Total curtailment: {sum(Pck_last)}")
     return Pk_current, Qk_current, dLp_pp_list, dLq_pp_list, tot_cost_v
 
 
@@ -409,7 +410,7 @@ class OMOO:
         if len(ind) == 0:
             P_0, Q_0 = P_0 * self.base_power, Q_0 * self.base_power
             set_power = False
-            logger.debug("Skip this step since no violation")
+            logger.info("Skip this step since no violation")
             logger.debug(f"minimum V_hat is {np.min(V_hat)}")
             logger.debug(f"maximum V_hat is {np.max(V_hat)}")
             return P_0, Q_0, set_power, V_hat
@@ -424,10 +425,11 @@ class OMOO:
             pv_set_point_real, pv_set_point_imag = np.zeros(N_pv), np.zeros(N_pv)
             uni_Vmax = np.ones(N_node) * self.parameters.Vmax
             uni_Vmin = np.ones(N_node) * self.parameters.Vmin
-
+            logger.info(f"ratio_t_k: {self.parameters.ratio_t_k}")
+            logger.info(f"iteration, total cost, v_max")
             for jj in range(self.parameters.ratio_t_k):
                 # Updating P, Q
-                Pk_last, Qk_last, _, _, _ = pv_cost(
+                Pk_last, Qk_last, _, _, total_cost = pv_cost(
                     self.G,
                     self.H,
                     N_node,
@@ -443,6 +445,7 @@ class OMOO:
                     pv_set_point_real,
                     pv_set_point_imag,
                 )
+                logger.info(f"{jj}, {total_cost}")
                 # Updating Vk
                 Ppv, Qpv = np.zeros(self.num_node), np.zeros(self.num_node)
                 for pp, pv_ii in enumerate(self.pv_index):
@@ -480,15 +483,15 @@ class OMOO:
             Ppv, Qpv = np.delete(Ppv, self.slack_bus), np.delete(Qpv, self.slack_bus)
             V_hat_final = Vk_wopv + self.G @ Ppv + self.H @ Qpv
 
-            # logger.debug(f"Before OMOO, the violated ones are {V_hat[ind]}")
-            # logger.debug(f"After opf, approxiamted violations: {V_hat_final[ind]}")
+            # logger.info(f"Before OMOO, the violated ones are {V_hat[ind]}")
+            # logger.info(f"After opf, approxiamted violations: {V_hat_final[ind]}")
             logger.debug(
                 f"Target bounds are [{self.parameters.Vmax}, {self.parameters.Vmin}]"
             )
             return (
                 Pk_last * self.base_power,
                 Qk_last * self.base_power,
-                True,
+                True,  # if true, it will publish to PVs
                 V_hat_final,
             )
 
@@ -605,8 +608,8 @@ class OMOOFederate:
         power_P = None
         power_Q = None
         while granted_time < h.HELICS_TIME_MAXTIME:
-            logger.debug("granted_time")
-            logger.debug(granted_time)
+
+            logger.info(f" ~~~~~~~~~~~~~~ granted_time: {granted_time} ~~~~~~~~~~~~~~")
             if not self.sub_voltages_real.is_updated():
                 granted_time = h.helicsFederateRequestTime(
                     self.vfed, h.HELICS_TIME_MAXTIME
@@ -620,7 +623,7 @@ class OMOOFederate:
             voltages = measurement_to_xarray(
                 voltages_real
             ) + 1j * measurement_to_xarray(voltages_imag)
-            logger.debug(np.max(np.abs(voltages) / v))
+            logger.info(f"max voltage: {np.max(np.abs(voltages.values) / v.values)}")
             assert topology.base_voltage_magnitudes.ids == list(voltages.ids.data)
 
             injections = Injection.parse_obj(self.injections.json)
@@ -695,7 +698,7 @@ class OMOOFederate:
             ), f"Invalid pmpp at index {np.argmax((pmpp > 1) | (pmpp < 0))}: {pmpp[np.argmax((pmpp > 1) | (pmpp < 0))]}"
 
             te = time.time()
-            logger.debug(f"OMOO takes {(te-ts)/60} (min)")
+            logger.info(f"OMOO takes {(te-ts)} (seconds)")
 
             power_set_xr = (
                 xr.DataArray(power_set, coords={"equipment_ids": pv.loc[:, "name"]})
