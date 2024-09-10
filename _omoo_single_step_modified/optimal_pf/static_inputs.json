@@ -1,1 +1,1 @@
-{"algorithm_parameters": {"ratio_t_k": 1500, "tol": 1e-05}, "name": "optimal_pf"}
+{"algorithm_parameters": {"ratio_t_k": 175, "tol": 1e-05}, "name": "optimal_pf"}

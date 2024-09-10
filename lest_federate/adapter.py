@@ -153,8 +153,8 @@ def extract_powers(bus: dict, real: PowersReal, imag: PowersImaginary) -> dict:
             continue
 
         phase = int(phase) - 1
-        bus[name]["eqid"] = eq
-        bus[name]["pq"][phase][0] = power*1000
+        # bus[name]["eqid"] = eq
+        bus[name]["pq"][phase][0] += power*1000
 
     for id, eq, power in zip(imag.ids, imag.equipment_ids, imag.values):
         name, phase = convert_id(id)
@@ -165,8 +165,8 @@ def extract_powers(bus: dict, real: PowersReal, imag: PowersImaginary) -> dict:
             continue
 
         phase = int(phase) - 1
-        bus[name]["eqid"] = eq
-        bus[name]["pq"][phase][1] = power*1000
+        # bus[name]["eqid"] = eq
+        bus[name]["pq"][phase][1] += power*1000
     return bus
 
 
